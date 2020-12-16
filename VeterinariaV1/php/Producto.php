@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro productos</title>
+    <link rel="icon" href="../IMAGENES/icon1.png">
+    <link rel="stylesheet" href="../css/estilos.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/editar.js"></script>
+</head>
+
+<body>
+    <div class="logo_main">
+        <a href="../index.html">
+            <img src="../IMAGENES/img3.png" alt="Logo" width="550px" height="170px">
+        </a>
+    </div>
+    <header>
+        <input type="checkbox" id="btn-menu">
+        <label for="btn-menu"> <img src="../IMAGENES/men.png" alt="Error al cargar la imagen" width="40" height="40">
+        </label>
+        <nav class="menu" id="menu">
+            <ul>
+                <li><a href="inventario.php">INVENTARIO</a></li>
+                <li><a href="Mascota.php">REGISTRO MASCOTAS</a></li>
+                <li><a href="#">REGISTRO PRODUCTOS</a></li>
+                <li><a href="AtencionMascota.php">ATENCION A LA MASCOTA</a></li>
+                <li><a href="logOut.php">CERRAR SESION</a></li>
+
+            </ul>
+        </nav>
+    </header>
+    <div id="regis">
+        <div class="Contene-inputs">
+            <img class="avatar" src="../IMAGENES/icon2.jpg" alt="Error al cargar la imagen">
+            <h1>REGISTRO PRODUCTO</h1>
+            <!--Formulario-->
+            <form action="Registrar_Producto/R_Producto.php" method="POST" enctype='multipart/form-data'>
+                <label for="Codigo">Codigo</label>
+                <input type="text" name="codigo" placeholder="Codigo" required>
+                <label for="Imagen">Imagen</label>
+                <input type="file" name="imagen" placeholder="Imagen" required>
+                <label for="Nombre Producto">Nombre Producto</label>
+                <input type="text" name="nombreP" placeholder="Nombre" required>
+                <label for="Descripcion">Descripcion</label>
+                <textarea name="descripcion" placeholder="Descripcion" style="width:100%;"></textarea>
+                <div>
+                    <label for="Especie">Especie</label>
+                    <select name="cboEspecie" style="width:100%;">
+                        <option value="0">Seleccionar</option>
+                        <option value="Perro">Perro</option>
+                        <option value="Gato">Gato</option>
+                    </select>
+                </div><br>
+                <div>
+                    <label for="Categoria">Categoria</label>
+                    <select name="cboCategoria"  style="width:100%;">
+                    <option value="0">Seleccione categoria</option>
+                    <?php
+                        require("conexion.php");
+                        $consulta = "SELECT * FROM categoria_producto";
+                        $resultado = $conexion->query($consulta);
+                        while ($fila = $resultado->fetch_assoc()) {
+                    ?>
+                    <option value="<?php echo $fila['CodigoC']; ?>"><?php echo $fila['Nombre_Categoria']; ?></option>
+                    <?php
+                        }
+                    ?>
+                    </select>
+                </div><br>
+                <label for="Cantidad">Cantidad</label>
+                <input type="text" name="cantidad" placeholder="Cantidad" required>
+                <label for="Precio compra">Precio compra</label>
+                <input type="text" name="precio_compra" placeholder="Precio compra" required>
+                <label for="Precio venta">Precio venta</label>
+                <input type="text" name="precio_venta" placeholder="Precio venta" required>
+                <input type="submit" value="REGISTRAR">
+            </form>
+            <!--Fin formulario-->
+        </div>
+    </div>
+<!--Tabla de productos-->
+<div id="table">
+        <table class="table">
+            <tr>
+                <th>Código</th>
+                <th >Imagen</th>
+                <th>Nombre</th>
+                <th style="width:380px">Descripción</th>
+                <th>Especie</th>
+                <th>Categoria</th>
+                <th>Stock</th>
+                <th>Precio de compra</th>
+                <th>Precio de venta</th>   
+                <th>Editar</th>
+                <th>Eliminar</th>
+            </tr>
+            <?php                                   
+                require("conexion.php");
+                $consulta = "SELECT * FROM producto p, categoria_producto cp WHERE p.Categoria= cp.CodigoC";
+                $resultado = $conexion->query($consulta);
+                while ($fila = $resultado->fetch_assoc()) {
+                    
+            ?>
+            <tr>
+                <td> <?php echo $fila['Codigo']; ?></td>
+                
+                <td>  <?php 
+                 
+                 
+                echo '<img style="width:180px" src="data:image/jpeg;base64,'.base64_encode($fila["Imagen"]).'"/>';
+                
+                ?></td>
+                <td> <?php echo $fila['Nombre_Producto']; ?></td>
+                <td> <?php echo $fila['Descripcion']; ?></td>
+                <td> <?php echo $fila['Especie']; ?></td>
+                <td> <?php echo $fila['Nombre_Categoria']; ?></td>
+                <td> <?php echo $fila['Cantidad']; ?></td>
+                <td> <?php echo number_format($fila['Precio_Compra'],2); ?></td>
+                <td> <?php echo number_format($fila['Precio_Venta'],2); ?></td>
+                <td>
+                    <a class="view__noreinfo" href="#exampleModal" onclick="dato(<?php echo $fila['Codigo'];?>)">
+                    <img src="../IMAGENES/edit.png" alt="Editar" style="height:40px"></a>
+                </td>
+                <td>
+                    <a href="Registrar_Producto/Eli_Producto.php?id=<?php echo $fila['Codigo']; ?>">
+                    <img src="../IMAGENES/trash.png" alt="Borrar" style="height:40px"></a>
+                </td>
+            </tr>
+            <?php
+                }
+         ?>
+        </table>
+    </div>
+<!--Fin tabla de productos-->
+
+ <!--Modal-->
+ <div class="openClick" id="exampleModal">
+        <div class="cajaModal efecto">
+            <a href="#close" title="Cerrar" class="close">X</a>
+            <h3>Editar registro de atención mascota</h3>
+            <!--From modal-->
+            <form action="Registrar_Producto/Ed_Producto.php" method="POST" enctype='multipart/form-data'>
+                
+            <div class="ModalCuerpo">
+                    <p id="espacio"></p>
+                <label for="Imagen">Imagen</label>
+                <input type="file" name="imagen" placeholder="Imagen">
+                <br>
+                <label for="Nombre Producto">Nombre Producto</label>
+                <input type="text" name="nombreP" placeholder="Nombre">
+                <br>
+                <label for="Descripcion">Descripcion</label>
+                <textarea name="descripcion" placeholder="Descripcion" style="width:100%;"></textarea>
+                <br>
+                <div>
+                    <label for="Especie">Especie</label>
+                    <select name="cboEspecie" style="width:100%;">
+                        <option value="0">Seleccionar</option>
+                        <option value="Perro">Perro</option>
+                        <option value="Gato">Gato</option>
+                    </select>
+                </div>
+                <br>
+                <div>
+                    <label for="Categoria">Categoria</label>
+                    <select name="cboCategoria"  style="width:100%;">
+                    <option value="0">Seleccione categoria</option>
+                    <?php
+                        require("conexion.php");
+                        $consulta = "SELECT * FROM categoria_producto";
+                        $resultado = $conexion->query($consulta);
+                        while ($fila = $resultado->fetch_assoc()) {
+                    ?>
+                    <option value="<?php echo $fila['CodigoC']; ?>"><?php echo $fila['Nombre_Categoria']; ?></option>
+                    <?php
+                        }
+                    ?>
+                    </select>
+                </div>
+                <br>
+                <label for="Cantidad">Cantidad</label>
+                <input type="text" name="cantidad" placeholder="Cantidad">
+                <br>
+                <label for="Precio compra">Precio compra</label>
+                <input type="text" name="precio_compra" placeholder="Precio compra">
+                <br>
+                <label for="Precio venta">Precio venta</label>
+                <input type="text" name="precio_venta" placeholder="Precio venta">
+                </div>
+                <div class="modalFooter">
+                    <button type="submit" id="guardar" class="btn btn-primary">Guardar cambios</button>
+                    <button> <a href="#close" title="Cerrar">Cerrar</a></button>
+                </div>
+            </form>
+            <!--Fin form modal-->
+        </div>
+    </div>
+    <!--Fin modal-->
+    <footer>
+        <p>
+            ¡AMAMOS A TUS MASCOTAS!
+        </p>
+    </footer>
+    <script src="../js/editar.js"></script>
+</body>
+
+</html>
